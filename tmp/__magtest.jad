@@ -1,0 +1,35 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) disassembler 
+
+import magarathea.ALU;
+import magarathea.Sys;
+
+public class __magtest
+{
+
+    public __magtest()
+    {
+    //    0    0:aload_0         
+    //    1    1:invokespecial   #1   <Method void Object()>
+    //    2    4:new             #2   <Class ALU>
+    //    3    7:dup             
+    //    4    8:invokespecial   #3   <Method void ALU()>
+    //    5   11:astore_1        
+    //    6   12:new             #4   <Class Sys>
+    //    7   15:dup             
+    //    8   16:invokespecial   #5   <Method void Sys()>
+    //    9   19:astore_2        
+    //   10   20:aload_1         
+    //   11   21:iconst_1        
+    //   12   22:putfield        #6   <Field int ALU.operator>
+    //   13   25:aload_1         
+    //   14   26:iconst_1        
+    //   15   27:invokevirtual   #7   <Method void ALU.add(int)>
+    //   16   30:aload_2         
+    //   17   31:aload_1         
+    //   18   32:getfield        #8   <Field int ALU.result>
+    //   19   35:invokevirtual   #9   <Method void Sys.shutdown(int)>
+    //   20   38:return          
+    }
+}

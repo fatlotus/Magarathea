@@ -1,0 +1,60 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) 
+
+import magarathea.*;
+
+public class __magjit extends JITMemorySegment
+{
+
+    public __magjit()
+    {
+    }
+
+    public void evaluate(int i)
+    {
+        int j;
+        ALU alu;
+        Sys sys;
+        j = 0;
+        alu = new ALU();
+        sys = new Sys();
+        Memory memory = new Memory(this);
+        IO io = new IO(this);
+        i;
+        JVM INSTR tableswitch 0 6: default 88
+    //                   0 88
+    //                   1 97
+    //                   2 106
+    //                   3 113
+    //                   4 124
+    //                   5 129
+    //                   6 140;
+           goto _L1 _L1 _L2 _L3 _L4 _L5 _L6 _L7
+_L1:
+        10;
+        alu;
+        JVM INSTR swap ;
+        operand;
+_L2:
+        1;
+        alu;
+        JVM INSTR swap ;
+        add();
+_L3:
+        j = alu.result;
+_L4:
+        alu.result;
+        alu;
+        JVM INSTR swap ;
+        print();
+_L5:
+        if(j == 0) goto _L1; else goto _L6
+_L6:
+        alu.result;
+        sys;
+        JVM INSTR swap ;
+        shutdown();
+_L7:
+    }
+}

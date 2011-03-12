@@ -1,0 +1,30 @@
+divider = memory_size / 2;
+_offset = divider
+
+do {
+	_offset += 4;
+	put _offset, 0xffffffff
+	if get(_offset) != 0xffffffff { goto error; }
+	
+	put _offset, 0x00000000
+	if get(_offset) != 0x00000000 { goto error; }
+} while (offset < memory_size);
+
+_a = 0
+_b = divider
+do {
+	_a += 4
+	_b += 4
+	put _b, get(_a) 
+} while (_get(_a) != 0);
+
+do {
+	_offset += 4;
+	put _offset, 0xffffffff
+	if get(_offset) != 0xffffffff { goto error; }
+	
+	put _offset, 0x00000000
+	if get(_offset) != 0x00000000 { goto error; }
+} while (offset < divider);
+
+#RAW{00 00 00 00 00 00 00 00}
