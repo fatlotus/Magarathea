@@ -14,47 +14,67 @@ public class __magjit extends JITMemorySegment
     public void evaluate(int i)
     {
         int j;
-        ALU alu;
-        Sys sys;
+        Memory memory;
         j = 0;
-        alu = new ALU();
-        sys = new Sys();
-        Memory memory = new Memory(this);
+        ALU alu = new ALU();
+        Sys sys = new Sys();
+        memory = new Memory(this);
         IO io = new IO(this);
         i;
-        JVM INSTR tableswitch 0 6: default 88
-    //                   0 88
-    //                   1 97
-    //                   2 106
-    //                   3 113
-    //                   4 124
-    //                   5 129
-    //                   6 140;
-           goto _L1 _L1 _L2 _L3 _L4 _L5 _L6 _L7
+        JVM INSTR tableswitch 0 9: default 100
+    //                   0 100
+    //                   1 109
+    //                   2 118
+    //                   3 127
+    //                   4 136
+    //                   5 145
+    //                   6 154
+    //                   7 163
+    //                   8 172
+    //                   9 177;
+           goto _L1 _L1 _L2 _L3 _L4 _L5 _L6 _L7 _L8 _L9 _L10
 _L1:
-        10;
-        alu;
+        32768;
+        memory;
         JVM INSTR swap ;
-        operand;
+        pointer;
 _L2:
-        1;
-        alu;
+        0x666c79;
+        memory;
         JVM INSTR swap ;
-        add();
+        write();
 _L3:
-        j = alu.result;
+        32771;
+        memory;
+        JVM INSTR swap ;
+        pointer;
 _L4:
-        alu.result;
-        alu;
+        0x6e6e3e;
+        memory;
         JVM INSTR swap ;
-        print();
+        write();
 _L5:
-        if(j == 0) goto _L1; else goto _L6
-_L6:
-        alu.result;
-        sys;
+        32774;
+        memory;
         JVM INSTR swap ;
-        shutdown();
+        pointer;
+_L6:
+        0x202020;
+        memory;
+        JVM INSTR swap ;
+        write();
 _L7:
+        34689;
+        memory;
+        JVM INSTR swap ;
+        pointer;
+_L8:
+        7;
+        memory;
+        JVM INSTR swap ;
+        write();
+_L9:
+        if(j == 0) goto _L1; else goto _L10
+_L10:
     }
 }

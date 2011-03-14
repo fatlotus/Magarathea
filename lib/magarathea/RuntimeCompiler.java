@@ -352,14 +352,16 @@ public class RuntimeCompiler {
 				short _code_ = constantize("Code");
 				
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				FileOutputStream fos = new FileOutputStream("tmp/__magjit.class");
 				
 				DataOutputStream dos;
 				
 				if (isRunningJIT()) { // if we're disassembling, output data to
 				                      // file rather than load into JVM.
+					
 					dos = new DataOutputStream(baos);
 				} else {
+					FileOutputStream fos = new FileOutputStream("tmp/__magjit.class");
+					
 					dos = new DataOutputStream(fos);
 				}
 				
@@ -543,10 +545,13 @@ public class RuntimeCompiler {
 		jit.addLocal("");
 		jit.addLocal("__JMP");
 		
+		dryRun.emitConstantInt(0);
+		dryRun.emitStoreIntegerLocal(2);
+		
 		jit.emitConstantInt(0);
 		jit.emitStoreIntegerLocal(2);
 		
-		for (Class klass : collect.getModules()) {
+		for (Class<?> klass : collect.getModules()) {
 			if (klass != null) {
 				int localVariable = jit.addLocal(klass.getName());
 				

@@ -9,7 +9,7 @@ public class ALU {
 	
 	@Write(id=0x000010, name="add")
 	public void add(int value) {
-		result = operand - value;
+		result = operand + value;
 	}
 	
 	@Write(id=0x000012, name="sub")

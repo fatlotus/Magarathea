@@ -1,24 +1,25 @@
 #!/usr/bin/env bash
-# simple build script. if no actions are specified, it builds the script.
+# simple build script. if no actions are specified, it builds the program for distribution
 
 ARGS="$@"
 
 if [ -z "$ARGS" ]; then
-	ARGS="compile"
+	ARGS="compile build"
 fi
 
 for argument in $ARGS; do
-	if [ $argument == "compile" ]; then		
-		git 1>/dev/null 2>/dev/null
+	if [ $argument == "compile" ]; then
+		mkdir -p build
+		git rev-parse 1>/dev/null 2>/dev/null
 
 		if [ $? -eq 0 ]; then
-			echo "Building commit `git rev-parse HEAD`..."
+			echo "Building `git rev-parse HEAD`-"
 		else
-			echo "Building commit UNKNOWN..."
+			echo "Building UNKNOWN-"
 		fi
 		cd lib/ &&
-		find . -name "*.java" | xargs javac -d ../build &&
-		echo "Build complete!" &&
+		find . -name "*.java" | xargs javac -Xlint:unchecked -d ../build &&
+		echo "  -complete" &&
 		cd ../
 	elif [ $argument == "clean" ]; then
 		echo "Removing build/ directory..."
@@ -39,6 +40,17 @@ for argument in $ARGS; do
 		echo "Decompiling tmp/__magjit.class" &&
 		bin/jad -o -d tmp/ tmp/__magjit.class &&
 		echo "Done!"
+	elif [ $argument == "dist" ]; then
+		git rev-parse 1>/dev/null 2>/dev/null
+
+		if [ $? -eq 0 ]; then
+			echo "Building distribution `git rev-parse HEAD`-"
+		else
+			echo "Building distribution UNKNOWN-"
+		fi
+		cd build &&
+		jar cf ../magarathea.jar * 1>/dev/null &&
+		echo "  -complete"
 	else
 		echo "** unknown action $argument **"
 		exit 1

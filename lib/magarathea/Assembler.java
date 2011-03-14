@@ -7,8 +7,9 @@ public class Assembler {
 	private DataOutput output;
 	private OpcodeCollection collect;
 	
-	public Assembler(OpcodeCollection coll, BufferedReader in, OutputStream out) {
-		input = in;
+	public Assembler(OutputStream out) { this(OpcodeCollection.instance(), out); }
+	
+	public Assembler(OpcodeCollection coll, OutputStream out) {
 		output = new DataOutputStream(out);
 		collect = coll;
 	}
@@ -57,7 +58,7 @@ public class Assembler {
 		
 		jumpOffset += 16;
 		
-		processInstruction("#" + jumpOffset, "jmp.branch");
+		processInstruction("#" + 0, "jmp.branch");
 	}
 	
 	public void test3() {
@@ -117,7 +118,7 @@ public class Assembler {
 		}
 	}
 	
-	private void processInstruction(String left, String right) {
+	public void processInstruction(String left, String right) {
 		processLeftHandSide(left);
 		processRightHandSide(right);
 	}

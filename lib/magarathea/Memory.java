@@ -10,17 +10,15 @@ public class Memory {
 		segment = seg;
 	}
 	
-	@ReadWrite(id=0x01, name="ptr")
+	@ReadWrite(id=0x01, name="addr")
 	public int pointer;
 	
-	@ReadWrite(id=0x05, name="value")
+	@ReadWrite(id=0x05, name="result")
 	public int value;
 	
 	@Write(id=0x03, name="read")
 	public void read(int ptr) {
 		value = segment.getComputer().readFromRAM(ptr);
-		
-		System.err.println("GETTING @" + ptr + " = #" + value);
 	}
 	
 	@Write(id=0x04, name="write")

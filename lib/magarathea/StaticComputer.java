@@ -11,18 +11,10 @@ public class StaticComputer implements Computer {
 	Set<MemoryListener> listeners;
 	Map<Integer, IO.Device> peripherals;
 	
-	public StaticComputer() {
+	public StaticComputer(byte[] assembledCode) {
 		listeners = new HashSet<MemoryListener>();
 		peripherals = new HashMap<Integer, IO.Device>();
 		randomAccessMemory = new byte[1024 * 1024 * 8];
-		
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		
-		Assembler asm = new Assembler(OpcodeCollection.instance(), null, baos);
-		asm.testWithIO();
-		// asm.test("flynn> ");
-		
-		byte[] assembledCode = baos.toByteArray();
 		
 		copyIntoRAM(0, assembledCode, 0, assembledCode.length);
 	}
@@ -76,10 +68,25 @@ public class StaticComputer implements Computer {
 	}
 	
 	public void execute() {
+		long recompileStart = System.nanoTime();
+		
 		JITMemorySegment seg = RuntimeCompiler.recompile(OpcodeCollection.instance(),
 		  randomAccessMemory, 0, randomAccessMemory.length);
 		
+		long recompileEnd = System.nanoTime();
+		
+		System.err.println("Recompilation took: " + (recompileEnd - recompileStart) + "ns");
+		
 		seg.setComputer(this);
-		seg.executeSafely(0);
+		
+		long start = System.currentTimeMillis();
+		
+		try {
+			seg.executeSafely(0);
+		} finally {
+			long end = System.currentTimeMillis();
+			
+			System.err.println("Execution took: " + (end - start) + "ns");
+		}
 	}
 }
