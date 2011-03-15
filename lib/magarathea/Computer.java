@@ -8,4 +8,9 @@ public interface Computer {
 	public void removeMemoryListener(MemoryListener l);
 	public void execute();
 	public void prepareIOSubsystem(IO io);
+	public boolean isRunning();
+	public void start();
+	public void stop();
+	public void step();
+	void breakpoint();
 }

@@ -7,6 +7,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class RuntimeCompiler {
+	private RuntimeCompiler() { }
+	
+	public static class Options {
+		public boolean debuggingMode = true;
+	}
+	
 	private static class JITClassLoader extends ClassLoader {
 		private ArrayList<byte[]> constantPool;
 		private DataOutputStream bytecode;
@@ -491,15 +497,17 @@ public class RuntimeCompiler {
 		
 		if (odd == 0x90000000) { // jmp.branch
 			if ((even & 0xff000000) != 0x11000000 || (start % 8 != (even % 8))) {
-				throw new RuntimeException("dynamic jumps not yet supported!");
-			}
-			
-			jit.emitIntegerLocal(2);
-			
-			if (extents == null) {
-				jit.emitGotoIf(0);
+				jit.emitLocal(0);
+				jit.emitSwap();
+				jit.emitMethodCall("magarathea/JITMemorySegment", "jumpTo", "(I)V");
 			} else {
-				jit.emitGotoIf(extents.get((even & 0x00ffffff - start) / 8) + jumpOffset - jit.getSizeOfBytecode());
+				jit.emitIntegerLocal(2);
+				
+				if (extents == null) {
+					jit.emitGotoIf(0);
+				} else {
+					jit.emitGotoIf(extents.get((even & 0x00ffffff - start) / 8) + jumpOffset - jit.getSizeOfBytecode());
+				}
 			}
 		} else if (odd == 0x90000001) { // jmp.nonneg
 			jit.emitConstantInt(1 << 31);
@@ -539,6 +547,11 @@ public class RuntimeCompiler {
 	}
 	
 	public static JITMemorySegment recompile(OpcodeCollection collect, byte[] code, int start, int end) {
+		return recompile(collect, code, start, end, new Options());
+	}
+	
+	public static JITMemorySegment recompile(OpcodeCollection collect, byte[] code, int start, int end,
+	  Options options) {
 		JITClassLoader jit = new JITClassLoader();
 		JITClassLoader dryRun = new JITClassLoader(); // used only to generate extents.
 		
@@ -592,6 +605,11 @@ public class RuntimeCompiler {
 				int even = in.readInt();
 				int odd = in.readInt();
 				
+				if (options.debuggingMode) {
+					dryRun.emitLocal(0);
+					dryRun.emitMethodCall("magarathea.JITMemorySegment", "breakpoint", "()V");
+				}
+				
 				try {
 					writeLHS(dryRun, collect, even, odd);
 					writeRHS(dryRun, collect, even, odd, null, start, end, 0);
@@ -608,6 +626,11 @@ public class RuntimeCompiler {
 			for (int i = start; i < end; i += 8) {
 				int even = in.readInt();
 				int odd = in.readInt();
+				
+				if (options.debuggingMode) {
+					jit.emitLocal(0);
+					jit.emitMethodCall("magarathea.JITMemorySegment", "breakpoint", "()V");
+				}
 				
 				try {
 					writeLHS(jit, collect, even, odd);

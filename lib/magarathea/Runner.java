@@ -126,6 +126,7 @@ public class Runner {
 		win.setLocationRelativeTo(null);
 		win.setVisible(true);
 		
-		c.execute();
+		Debugger d = new Debugger(c);
+		d.runWithGUI();
 	}
 }
