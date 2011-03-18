@@ -94,7 +94,13 @@ public class Assembler {
 	
 	private void processLeftHandSide(String left) {
 		if (left.charAt(0) == '#') {
-			op(0x11000000 | (Integer.parseInt(left.substring(1)) & 0x00ffffff));
+			int ivalue = Integer.parseInt(left.substring(1));
+			
+			if ((ivalue & 0xff000000) != 0) {
+				throw new RuntimeException("invalid literal: " + ivalue);
+			}
+			
+			op(0x11000000 | (ivalue & 0x00ffffff));
 		} else {
 			OpcodeCollection.Output out = collect.getLeftHandSide(left);
 			
@@ -104,18 +110,17 @@ public class Assembler {
 	}
 	
 	private void processRightHandSide(String right) {
-		if (right.equals("jmp.branch")) {
+		/* if (right.equals("jmp.branch")) {
 			op(0x90000000);
 		} else if (right.equals("jmp.nonneg")) {
 			op(0x90000001);
 		} else if (right.equals("jmp.zero")) {
 			op(0x90000002);
-		} else {
-			OpcodeCollection.Output out = collect.getRightHandSide(right);
-			
-			if (out == null) throw new RuntimeException("unknown RHS: " + right);
-			op(out.opcode);
-		}
+		} else { */
+		OpcodeCollection.Output out = collect.getRightHandSide(right);
+		
+		if (out == null) throw new RuntimeException("unknown RHS: " + right);
+		op(out.opcode);
 	}
 	
 	public void processInstruction(String left, String right) {

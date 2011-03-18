@@ -23,7 +23,8 @@ public class Memory {
 	
 	@Write(id=0x04, name="write")
 	public void write(int value) {
-		System.err.printf("putting #%d into %x\n", value, pointer);
 		segment.getComputer().writeToRAM(pointer, value);
+		
+		System.err.printf("RAM: (write, %#08x, %d)\n", pointer, value);
 	}
 }

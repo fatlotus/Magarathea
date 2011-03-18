@@ -8,6 +8,8 @@ public abstract class JITMemorySegment {
 	public void setExtents(int start, int end) {
 		startOffset = start;
 		endOffset = end;
+		
+		jumpDestination = -1;
 	}
 	
 	public int getJumpDestination() {
@@ -26,14 +28,11 @@ public abstract class JITMemorySegment {
 		return startOffset <= offset && endOffset > offset;
 	}
 	
-	protected void breakpoint() {
-		System.err.println("BREAKPOINTING!");
-		getComputer().breakpoint();
+	protected void breakpoint(int offset) {
+		getComputer().breakpoint(offset);
 	}
 	
 	protected void jumpTo(int offset) {
-		System.err.println("JUMPING TO: " + offset);
-		
 		jumpDestination = offset;
 		
 		throw JumpException.instance;
@@ -46,8 +45,13 @@ public abstract class JITMemorySegment {
 			try {
 				evaluate(offset);
 				done = true;
-			} catch (JumpException exc) {
-				offset = jumpDestination;
+			} catch (JumpException exc) {	
+				if (jumpDestination < startOffset || jumpDestination >= endOffset)
+					throw exc;
+				
+				int internalOffset = (jumpDestination - startOffset) / 8;
+				
+				offset = internalOffset;
 			}
 		}
 		

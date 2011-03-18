@@ -8,17 +8,25 @@ import java.util.Map;
 
 public class StaticComputer implements Computer {
 	byte[] randomAccessMemory;
-	Set<MemoryListener> listeners;
+	Set<MemoryListener> memoryListeners;
+	Set<ExecutionListener> executionListeners;
 	Map<Integer, IO.Device> peripherals;
 	boolean isRunning;
+	int currentOffset;
 	
 	public StaticComputer(byte[] assembledCode) {
-		listeners = new HashSet<MemoryListener>();
+		memoryListeners = new HashSet<MemoryListener>();
+		executionListeners = new HashSet<ExecutionListener>();
 		peripherals = new HashMap<Integer, IO.Device>();
 		randomAccessMemory = new byte[1024 * 1024 * 8];
 		isRunning = false;
+		currentOffset = 0;
 		
 		copyIntoRAM(0, assembledCode, 0, assembledCode.length);
+	}
+	
+	public int getLengthOfRAM() {
+		return randomAccessMemory.length;
 	}
 	
 	public void readSegmentOfRAM(byte[] buffer, int bufferOffset, int ramOffset, int length) {
@@ -34,7 +42,7 @@ public class StaticComputer implements Computer {
 	}
 	
 	public void writeToRAM(int offset, int value) {
-		for (MemoryListener listener : listeners) {
+		for (MemoryListener listener : memoryListeners) {
 			listener.segmentWrittenTo(this, offset, value);
 		}
 		
@@ -45,18 +53,26 @@ public class StaticComputer implements Computer {
 	}
 	
 	public int readFromRAM(int offset) {
-		return (randomAccessMemory[offset    ] << 24) |
-		       (randomAccessMemory[offset + 1] << 16) |
-		       (randomAccessMemory[offset + 2] << 8)  |
-		       (randomAccessMemory[offset + 3]     ) ;
+		return ((int)(randomAccessMemory[offset    ] & 0xff) << 24) |
+		       ((int)(randomAccessMemory[offset + 1] & 0xff) << 16) |
+		       ((int)(randomAccessMemory[offset + 2] & 0xff) << 8)  |
+		       ((int)(randomAccessMemory[offset + 3] & 0xff)     ) ;
 	}
 	
 	public void addMemoryListener(MemoryListener l) {
-		listeners.add(l);
+		memoryListeners.add(l);
 	}
 	
 	public void removeMemoryListener(MemoryListener l) {
-		listeners.remove(l);
+		memoryListeners.remove(l);
+	}
+	
+	public void addExecutionListener(ExecutionListener l) {
+		executionListeners.add(l);
+	}
+	
+	public void removeExecutionListener(ExecutionListener l) {
+		executionListeners.remove(l);
 	}
 	
 	public void prepareIOSubsystem(IO io) {
@@ -75,21 +91,38 @@ public class StaticComputer implements Computer {
 	
 	public synchronized void start() {
 		isRunning = true;
+		
+		for (ExecutionListener l : executionListeners) {
+			l.executionStatusChanged(this);
+		}
+		
 		notifyAll();
 	}
 	
 	public synchronized void stop() {
 		isRunning = false;
+		
+		for (ExecutionListener l : executionListeners) {
+			l.executionStatusChanged(this);
+		}
 	}
 	
-	public synchronized void breakpoint() {
-		if (!isRunning()) { // may be slightly unstable; things can be woken up for no reason.
-			try {
-				System.err.println("pausing...");
+	public synchronized void breakpoint(int position) {
+		try {
+			currentOffset = position;
+			
+			for (ExecutionListener l : executionListeners) {
+				l.programCounterChanged(this);
+			}
+			
+			if (!isRunning()) {
 				wait();
-				System.err.println("resuming!");
-			} catch (InterruptedException e) { throw new RuntimeException(e); }
-		}
+			}
+		} catch (InterruptedException e) { throw new RuntimeException(e); }
+	}
+	
+	public int getProgramCounter() {
+		return currentOffset;
 	}
 	
 	public synchronized void step() {

@@ -607,7 +607,8 @@ public class RuntimeCompiler {
 				
 				if (options.debuggingMode) {
 					dryRun.emitLocal(0);
-					dryRun.emitMethodCall("magarathea.JITMemorySegment", "breakpoint", "()V");
+					dryRun.emitConstantInt(i);
+					dryRun.emitMethodCall("magarathea.JITMemorySegment", "breakpoint", "(I)V");
 				}
 				
 				try {
@@ -629,7 +630,8 @@ public class RuntimeCompiler {
 				
 				if (options.debuggingMode) {
 					jit.emitLocal(0);
-					jit.emitMethodCall("magarathea.JITMemorySegment", "breakpoint", "()V");
+					jit.emitConstantInt(i);
+					jit.emitMethodCall("magarathea.JITMemorySegment", "breakpoint", "(I)V");
 				}
 				
 				try {
@@ -641,6 +643,10 @@ public class RuntimeCompiler {
 			throw new RuntimeException(e);
 		}
 		
-		return jit.defineBytecode();
+		JITMemorySegment segment = jit.defineBytecode();
+		
+		segment.setExtents(start, end);
+		
+		return segment;
 	}
 }

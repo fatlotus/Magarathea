@@ -117,10 +117,31 @@ class OpcodeCollection {
 		registerModule(Sys.class);
 		registerModule(Memory.class);
 		registerModule(IO.class);
+		registerModule(Jump.class);
 	}
 	
 	public Class[] getModules() {
 		return modules;
+	}
+	
+	public String explainOpcode(int bytecode, boolean previousWasLHS) {
+		if (!previousWasLHS && ((bytecode & 0xff000000) == 0x11000000)) {
+			return "#" + (bytecode & 0x00ffffff);
+		}
+		
+		Output output;
+		
+		if (previousWasLHS) {
+			output = getRightHandSide(bytecode);
+		} else {
+			output = getLeftHandSide(bytecode);
+		}
+		
+		if (output != null) {
+			return output.descriptor;
+		} else {
+			return null;
+		}
 	}
 	
 	public Output getLeftHandSide(int operation) {
